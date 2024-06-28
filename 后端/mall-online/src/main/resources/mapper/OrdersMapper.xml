@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wanli.mapper.OrdersMapper">
+    <resultMap id="OrderGoodsSummaryMap" type="com.wanli.entity.dto.OrderGoodsDto">
+        <result property="goodsId" column="goods_id"/>
+        <result property="goodsName" column="goods_name"/>
+        <result property="quantity" column="quantity"/>
+        <result property="sales" column="sales"/>
+    </resultMap>
+
+    <select id="getOrderGoodsSummaryByBusinessId" resultMap="OrderGoodsSummaryMap">
+        SELECT
+            d.goods_id,
+            g.goods_name,
+            SUM(d.quantity) AS quantity,
+            SUM(d.quantity * g.goods_price) AS sales
+        FROM
+            sys_orders o
+                JOIN
+            sys_ordersdetailet d ON o.order_id = d.order_id
+                JOIN
+            sys_goods g ON d.goods_id = g.goods_id
+        WHERE
+            o.business_id = #{businessId}
+          AND o.state = 1
+        GROUP BY
+            d.goods_id, g.goods_name
+
+    </select>
+</mapper>
